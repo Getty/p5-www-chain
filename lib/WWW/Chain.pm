@@ -16,6 +16,7 @@ our $VERSION ||= '0.000';
       sub {
         my ( $chain, $first_response, $second_response ) = @_;
         $chain->stash->{two_calls_finished} = 'done';
+        return;
       };
   });
 
