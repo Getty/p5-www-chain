@@ -5,6 +5,8 @@ our $VERSION ||= '0.000';
 
 =head1 SYNOPSIS
 
+  # Coderef usage
+
   my $chain = WWW::Chain->new(HTTP::Request->new( GET => 'http://localhost/' ), sub {
     my ( $chain, $response ) = @_;
     $chain->stash->{first_request} = 'done';
@@ -17,6 +19,26 @@ our $VERSION ||= '0.000';
         return;
       };
   });
+
+  # Method usage (can be mixed with Coderef)
+
+  {
+    package TestWWWChainMethods;
+    use Moo;
+    extends 'WWW::Chain';
+
+    sub first_request {
+      $_[0]->stash->{a} = 1;
+      return HTTP::Request->new( GET => 'http://duckduckgo.com/' ), "second_request";
+    }
+
+    sub second_request {
+      $_[0]->stash->{b} = 2;
+      return;
+    }
+  }
+
+  my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://duckduckgo.com/' ), 'first_request');
 
   # Blocking usage:
 
