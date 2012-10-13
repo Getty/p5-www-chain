@@ -5,8 +5,6 @@ our $VERSION ||= '0.000';
 
 =head1 SYNOPSIS
 
-  my $ua = WWW::Chain::UA::LWP->new;
-
   my $chain = WWW::Chain->new(HTTP::Request->new( GET => 'http://localhost/' ), sub {
     my ( $chain, $response ) = @_;
     $chain->stash->{first_request} = 'done';
@@ -20,7 +18,20 @@ our $VERSION ||= '0.000';
       };
   });
 
+  # Blocking usage
+
+  my $ua = WWW::Chain::UA::LWP->new;
   $ua->request_chain($chain);
+
+  # ... or non blocking usage example
+
+  unless ($chain->done) {
+    my @http_requests = @{$chain->next_requests};
+    # ... execute the HTTP::Request objects to get HTTP::Response objects
+    $chain->next_responses(@http_responses);
+  }
+
+  # Working with the result
 
   print $chain->stash->{two_calls_finished};
 
