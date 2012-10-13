@@ -18,18 +18,17 @@ our $VERSION ||= '0.000';
       };
   });
 
-  # Blocking usage
+  # Blocking usage:
 
   my $ua = WWW::Chain::UA::LWP->new;
   $ua->request_chain($chain);
 
-  # ... or non blocking usage example
+  # ... or non blocking usage example:
 
-  unless ($chain->done) {
-    my @http_requests = @{$chain->next_requests};
-    # ... execute the HTTP::Request objects to get HTTP::Response objects
-    $chain->next_responses(@http_responses);
-  }
+  my @http_requests = @{$chain->next_requests};
+  # ... do something with the HTTP::Request objects to get HTTP::Response objects
+  $chain->next_responses(@http_responses);
+  # repeat those till $chain->done
 
   # Working with the result
 
@@ -37,11 +36,13 @@ our $VERSION ||= '0.000';
 
 =head1 DESCRIPTION
 
+The implementation is not finished (but fully working), API changes may occur...
+
 =cut
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
-use Scalar::Util 'blessed';
+use Safe::Isa;
 
 has stash => (
 	isa => HashRef,
@@ -58,7 +59,7 @@ has next_requests => (
 );
 
 has next_coderef => (
-	isa => CodeRef,
+	#isa => CodeRef,
 	is => 'rwp',
 	clearer => 1,
 );
@@ -83,6 +84,7 @@ has result_count => (
 
 sub BUILDARGS {
 	my $self = shift;
+	return $_[0] if (scalar @_ == 1 && ref $_[0] eq 'HASH');
 	my ( $next_requests, $next_coderef, @args ) = $self->parse_chain(@_);
 	return {
 		next_requests => $next_requests,
@@ -98,41 +100,45 @@ sub parse_chain {
 	my @requests;
 	while (@args) {
 		my $arg = shift @args;
-		if ( blessed($arg) && $arg->isa('HTTP::Request') ) {
+		if ( $arg->$_isa('HTTP::Request') ) {
 			push @requests, $arg;
 		} elsif (ref $arg eq 'CODE') {
 			$coderef = $arg;
 			last;
+		} elsif (ref $arg eq '') {
+			die "".(ref $self)."->parse_chain '".$arg."' is not a known function" unless $self->can($arg);
+			$coderef = $arg;
+			last;
 		} else {
-			die __PACKAGE__."->parse_chain got unparseable element".(defined $arg ? " ".$arg : "" );
+			die "".(ref $self)."->parse_chain got unparseable element".(defined $arg ? " ".$arg : "" );
 		}
 	}
-	die __PACKAGE__."->parse_chain found no HTTP::Request objects" unless @requests;
+	die "".(ref $self)."->parse_chain found no HTTP::Request objects" unless @requests;
 	return [@requests], $coderef, @args;
 }
 
 sub next_responses {
 	my ( $self, @responses ) = @_;
-	die __PACKAGE__."->next_responses can't be called on chain which is done." if $self->done;
+	die "".(ref $self)."->next_responses can't be called on chain which is done." if $self->done;
 	my $amount = scalar @{$self->next_requests};
-	die __PACKAGE__."->next_responses would need ".$amount." HTTP::Response objects to proceed"
+	die "".(ref $self)."->next_responses would need ".$amount." HTTP::Response objects to proceed"
 		unless scalar @responses == $amount;
-	die __PACKAGE__."->next_responses only takes HTTP::Response objects"
+	die "".(ref $self)."->next_responses only takes HTTP::Response objects"
 		if grep { !$_->isa('HTTP::Response') } @responses;
 	$self->clear_next_requests;
-	my @result = $self->next_coderef->($self, @responses);
+	my @result = $self->${\$self->next_coderef}(@responses);
 	$self->clear_next_coderef;
 	$self->_set_result_count($self->result_count + 1);
-	if ( defined $result[0] && blessed($result[0]) && $result[0]->isa('HTTP::Request') ) {
+	if ( $result[0]->$_isa('HTTP::Request') ) {
 		my ( $next_requests, $next_coderef, @args ) = $self->parse_chain(@result);
-		die __PACKAGE__."->next_responses can't parse the result, more arguments after CodeRef" if @args;
+		die "".(ref $self)."->next_responses can't parse the result, more arguments after CodeRef" if @args;
 		$self->_set_next_requests($next_requests);
 		$self->_set_next_coderef($next_coderef);
 		$self->_set_request_count($self->request_count + scalar @{$next_requests});
 		return 0;
 	}
 	$self->_set_done(1);
-	return 1;
+	return $self->stash;
 }
 
 1;
