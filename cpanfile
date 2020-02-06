@@ -1,5 +1,4 @@
 
-requires 'Cookie::Baker', '0.11';
 requires 'HTTP::Cookies', '6.08';
 requires 'LWP', '6.04';
 requires 'Moo', '1.000004';
