@@ -1,8 +1,6 @@
 package WWW::Chain;
 # ABSTRACT: A web request chain
 
-our $VERSION ||= '0.000';
-
 =head1 SYNOPSIS
 
   # Coderef usage
@@ -65,6 +63,7 @@ The implementation is not finished (but fully working), API changes may occur...
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;
+use WWW::Chain::UA::LWP;
 
 has stash => (
 	isa => HashRef,
@@ -114,6 +113,11 @@ sub BUILDARGS {
 		request_count => scalar @{$next_requests},
 		@args,
 	};
+}
+
+sub request_with_lwp {
+  my ( $self ) = @_;
+  return WWW::Chain::UA::LWP->new->request_chain($self);
 }
 
 sub parse_chain {
