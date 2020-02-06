@@ -29,7 +29,7 @@ our $VERSION ||= '0.000';
 
     sub first_request {
       $_[0]->stash->{a} = 1;
-      return HTTP::Request->new( GET => 'http://duckduckgo.com/' ), "second_request";
+      return HTTP::Request->new( GET => 'http://conflict.industries/' ), "second_request";
     }
 
     sub second_request {
@@ -38,7 +38,7 @@ our $VERSION ||= '0.000';
     }
   }
 
-  my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://duckduckgo.com/' ), 'first_request');
+  my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://conflict.industries/' ), 'first_request');
 
   # Blocking usage:
 
