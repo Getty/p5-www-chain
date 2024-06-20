@@ -5,7 +5,9 @@ package WWW::Chain;
 
   # Coderef usage
 
-  my $chain = WWW::Chain->new(HTTP::Request->new( GET => 'http://localhost/' ), sub {
+  use WWW::Chain; # exports www_chain
+
+  my $chain = www_chain(HTTP::Request->new( GET => 'http://localhost/' ), sub {
     my ( $chain, $response ) = @_;
     $chain->stash->{first_request} = 'done';
     return
@@ -25,18 +27,28 @@ package WWW::Chain;
     use Moo;
     extends 'WWW::Chain';
 
-    sub first_request {
-      $_[0]->stash->{a} = 1;
-      return HTTP::Request->new( GET => 'http://conflict.industries/' ), "second_request";
+    has path_part => (
+      is => 'ro',
+      required => 1,
+    );
+
+    # Function used to determine first requests on class, will be added to BUILDARGS
+    sub start_chain {
+      return HTTP::Request->new( GET => 'https://conflict.industries/'.$_[0]->path_part ), 'first_response';
     }
 
-    sub second_request {
+    sub first_response {
+      $_[0]->stash->{a} = 1;
+      return HTTP::Request->new( GET => 'https://conflict.industries/'.$_[0]->path_part ), 'second_response';
+    }
+
+    sub second_response {
       $_[0]->stash->{b} = 2;
       return;
     }
   }
 
-  my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://conflict.industries/' ), 'first_request');
+  my $chain = TestWWWChainMethods->new( path_part => 'wwwchain' );
 
   # Blocking usage:
 
@@ -56,7 +68,7 @@ package WWW::Chain;
 
 =head1 DESCRIPTION
 
-The implementation is not finished (but fully working), API changes may occur...
+More documentation to come, API stabilized.
 
 =cut
 
@@ -64,23 +76,25 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;
 use WWW::Chain::UA::LWP;
+use Exporter 'import';
+
+our @EXPORT = qw( www_chain );
 
 has stash => (
   isa => HashRef,
   is => 'lazy',
 );
-
 sub _build_stash {{}}
 
 has next_requests => (
   isa => ArrayRef,
   is => 'rwp',
+  lazy => 1,
   clearer => 1,
-  required => 1,
 );
 
-has next_coderef => (
-  #isa => CodeRef,
+has next_step => (
+  isa => AnyOf[Str, CodeRef],
   is => 'rwp',
   clearer => 1,
 );
@@ -88,31 +102,34 @@ has next_coderef => (
 has done => (
   isa => Bool,
   is => 'rwp',
+  lazy => 1,
   default => sub { 0 },
 );
 
 has request_count => (
   isa => Num,
   is => 'rwp',
+  lazy => 1,
   default => sub { 0 },
 );
 
 has result_count => (
   isa => Num,
   is => 'rwp',
+  lazy => 1,
   default => sub { 0 },
 );
 
-sub BUILDARGS {
-  my $self = shift;
-  return $_[0] if (scalar @_ == 1 && ref $_[0] eq 'HASH');
-  my ( $next_requests, $next_coderef, @args ) = $self->parse_chain(@_);
-  return {
+sub www_chain {
+  my ( @args ) = @_;
+  my ( $next_requests, $next_step, @others ) = __PACKAGE__->parse_chain(@args);
+  die __PACKAGE__." can only use coderef as next step" unless !$next_step or ref $next_step eq 'CODE';
+  return WWW::Chain->new(
     next_requests => $next_requests,
-    next_coderef => $next_coderef,
+    next_step => $next_step,
     request_count => scalar @{$next_requests},
-    @args,
-  };
+    @others,
+  );
 }
 
 sub request_with_lwp {
@@ -120,27 +137,30 @@ sub request_with_lwp {
   return WWW::Chain::UA::LWP->new->request_chain($self);
 }
 
+sub is_response { $_[1]->$_isa('HTTP::Response') }
+sub is_request { $_[1]->$_isa('HTTP::Request') }
+
 sub parse_chain {
   my ( $self, @args ) = @_;
-  my $coderef;
+  my $step;
   my @requests;
   while (@args) {
     my $arg = shift @args;
-    if ( $arg->$_isa('HTTP::Request') ) {
+    if ( $self->is_request($arg) ) {
       push @requests, $arg;
-    } elsif (ref $arg eq 'CODE') {
-      $coderef = $arg;
-      last;
     } elsif (ref $arg eq '') {
       die "".(ref $self)."->parse_chain '".$arg."' is not a known function" unless $self->can($arg);
-      $coderef = $arg;
+      $step = $arg;
+      last;
+    } elsif (ref $arg eq 'CODE') {
+      $step = $arg;
       last;
     } else {
-      die "".(ref $self)."->parse_chain got unparseable element".(defined $arg ? " ".$arg : "" );
+      die __PACKAGE__."->parse_chain got unparseable element".(defined $arg ? " ".$arg : "" );
     }
   }
-  die "".(ref $self)."->parse_chain found no HTTP::Request objects" unless @requests;
-  return [@requests], $coderef, @args;
+  die __PACKAGE__."->parse_chain found no HTTP::Request objects" unless @requests;
+  return \@requests, $step, @args;
 }
 
 sub next_responses {
@@ -150,21 +170,34 @@ sub next_responses {
   die "".(ref $self)."->next_responses would need ".$amount." HTTP::Response objects to proceed"
     unless scalar @responses == $amount;
   die "".(ref $self)."->next_responses only takes HTTP::Response objects"
-    if grep { !$_->isa('HTTP::Response') } @responses;
+    if grep { !$self->is_response($_) } @responses;
   $self->clear_next_requests;
-  my @result = $self->${\$self->next_coderef}(@responses);
-  $self->clear_next_coderef;
+  my @result = $self->${\$self->next_step}(@responses);
+  $self->clear_next_step;
   $self->_set_result_count($self->result_count + 1);
-  if ( $result[0]->$_isa('HTTP::Request') ) {
-    my ( $next_requests, $next_coderef, @args ) = $self->parse_chain(@result);
-    die "".(ref $self)."->next_responses can't parse the result, more arguments after CodeRef" if @args;
+  # If the first result is a request again, then we need to parse_chain again.
+  if ( $self->is_request($result[0]) ) {
+    my ( $next_requests, $next_step, @others ) = $self->parse_chain(@result);
+    die "".(ref $self)."->next_responses can't parse the result, more arguments after next step" if @others;
     $self->_set_next_requests($next_requests);
-    $self->_set_next_coderef($next_coderef);
+    $self->_set_next_step($next_step);
     $self->_set_request_count($self->request_count + scalar @{$next_requests});
     return 0;
   }
   $self->_set_done(1);
   return $self->stash;
+}
+
+sub BUILD {
+  my ( $self ) = @_;
+  unless ($self->next_requests) {    
+    die "".(ref $self)." has no start_chain function and no requests supplied on build" unless $self->can('start_chain');
+    my ( $next_requests, $next_step, @others ) = $self->parse_chain($self->start_chain);
+    die "".(ref $self)."->__build_next_requests can't parse the start_chain return, more arguments after next step" if scalar @others > 0;
+    die "".(ref $self)." has no requests from start_chain" unless scalar @{$next_requests} > 0;
+    $self->_set_next_step($next_step) if $next_step;
+    $self->_set_next_requests($next_requests);
+  }
 }
 
 1;
