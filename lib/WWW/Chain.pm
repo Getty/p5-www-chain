@@ -1,77 +1,6 @@
 package WWW::Chain;
 # ABSTRACT: A web request chain
 
-=head1 SYNOPSIS
-
-  # Coderef usage
-
-  use WWW::Chain; # exports www_chain
-
-  my $chain = www_chain(HTTP::Request->new( GET => 'http://localhost/' ), sub {
-    my ( $chain, $response ) = @_;
-    $chain->stash->{first_request} = 'done';
-    return
-      HTTP::Request->new( GET => 'http://localhost/' ),
-      HTTP::Request->new( GET => 'http://other.localhost/' ),
-      sub {
-        my ( $chain, $first_response, $second_response ) = @_;
-        $chain->stash->{two_calls_finished} = 'done';
-        return;
-      };
-  });
-
-  # Method usage (can be mixed with Coderef)
-
-  {
-    package TestWWWChainMethods;
-    use Moo;
-    extends 'WWW::Chain';
-
-    has path_part => (
-      is => 'ro',
-      required => 1,
-    );
-
-    # Function used to determine first requests on class, will be added to BUILDARGS
-    sub start_chain {
-      return HTTP::Request->new( GET => 'https://conflict.industries/'.$_[0]->path_part ), 'first_response';
-    }
-
-    sub first_response {
-      $_[0]->stash->{a} = 1;
-      return HTTP::Request->new( GET => 'https://conflict.industries/'.$_[0]->path_part ), 'second_response';
-    }
-
-    sub second_response {
-      $_[0]->stash->{b} = 2;
-      return;
-    }
-  }
-
-  my $chain = TestWWWChainMethods->new( path_part => 'wwwchain' );
-
-  # Blocking usage:
-
-  my $ua = WWW::Chain::UA::LWP->new;
-  $ua->request_chain($chain);
-
-  # ... or non blocking usage example:
-
-  my @http_requests = @{$chain->next_requests};
-  # ... do something with the HTTP::Request objects to get HTTP::Response objects
-  $chain->next_responses(@http_responses);
-  # repeat those till $chain->done
-
-  # Working with the result
-
-  print $chain->stash->{two_calls_finished};
-
-=head1 DESCRIPTION
-
-More documentation to come, API stabilized.
-
-=cut
-
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;
@@ -89,7 +18,6 @@ sub _build_stash {{}}
 has next_requests => (
   isa => ArrayRef,
   is => 'rwp',
-  lazy => 1,
   clearer => 1,
 );
 
@@ -193,7 +121,7 @@ sub BUILD {
   unless ($self->next_requests) {    
     die "".(ref $self)." has no start_chain function and no requests supplied on build" unless $self->can('start_chain');
     my ( $next_requests, $next_step, @others ) = $self->parse_chain($self->start_chain);
-    die "".(ref $self)."->__build_next_requests can't parse the start_chain return, more arguments after next step" if scalar @others > 0;
+    die "".(ref $self)." parse_chain can't parse the start_chain return, more arguments after next step" if scalar @others > 0;
     die "".(ref $self)." has no requests from start_chain" unless scalar @{$next_requests} > 0;
     $self->_set_next_step($next_step) if $next_step;
     $self->_set_next_requests($next_requests);
@@ -201,3 +129,75 @@ sub BUILD {
 }
 
 1;
+
+
+=head1 SYNOPSIS
+
+  # Coderef usage
+
+  use WWW::Chain; # exports www_chain
+
+  my $chain = www_chain(HTTP::Request->new( GET => 'http://localhost/' ), sub {
+    my ( $chain, $response ) = @_;
+    $chain->stash->{first_request} = 'done';
+    return
+      HTTP::Request->new( GET => 'http://localhost/' ),
+      HTTP::Request->new( GET => 'http://other.localhost/' ),
+      sub {
+        my ( $chain, $first_response, $second_response ) = @_;
+        $chain->stash->{two_calls_finished} = 'done';
+        return;
+      };
+  });
+
+  # Method usage (can be mixed with Coderef)
+
+  {
+    package TestWWWChainMethods;
+    use Moo;
+    extends 'WWW::Chain';
+
+    has path_part => (
+      is => 'ro',
+      required => 1,
+    );
+
+    # Function used to determine first requests on class, will be added to BUILDARGS
+    sub start_chain {
+      return HTTP::Request->new( GET => 'https://conflict.industries/'.$_[0]->path_part ), 'first_response';
+    }
+
+    sub first_response {
+      $_[0]->stash->{a} = 1;
+      return HTTP::Request->new( GET => 'https://conflict.industries/'.$_[0]->path_part ), 'second_response';
+    }
+
+    sub second_response {
+      $_[0]->stash->{b} = 2;
+      return;
+    }
+  }
+
+  my $chain = TestWWWChainMethods->new( path_part => 'wwwchain' );
+
+  # Blocking usage:
+
+  my $ua = WWW::Chain::UA::LWP->new;
+  $ua->request_chain($chain);
+
+  # ... or non blocking usage example:
+
+  my @http_requests = @{$chain->next_requests};
+  # ... do something with the HTTP::Request objects to get HTTP::Response objects
+  $chain->next_responses(@http_responses);
+  # repeat those till $chain->done
+
+  # Working with the result
+
+  print $chain->stash->{two_calls_finished};
+
+=head1 DESCRIPTION
+
+More documentation to come, API stabilized.
+
+=cut
