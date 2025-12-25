@@ -1,6 +1,6 @@
 package WWW::Chain;
 # ABSTRACT: A web request chain
-
+our $VERSION = '0.102';
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;

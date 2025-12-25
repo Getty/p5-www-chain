@@ -1,6 +1,6 @@
 package WWW::Chain::UA::LWP;
 # ABSTRACT: Using LWP::UserAgent to execute WWW::Chain chains
-
+our $VERSION = '0.102';
 use Moo;
 extends 'LWP::UserAgent';
 
