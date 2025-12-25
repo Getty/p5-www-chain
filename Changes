@@ -1,0 +1,112 @@
+{{$NEXT}}
+
+ - Switch to Dist::Zilla::PluginBundle::Git::VersionManager (through update of dzil bundle)
+
+=[ Old Changes ]===========================================
+
+------------------------------------------
+version 0.100 at 2024-07-03 00:59:30 +0000
+------------------------------------------
+
+  Change: b6056aa7b449bff35b72ce3671237ce3463024ed
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-03 02:58:59 +0000
+
+    Cleanup of file ending, smaller correction of the API, will be
+    released as 0.100 
+
+------------------------------------------
+version 0.007 at 2024-06-20 19:23:56 +0000
+------------------------------------------
+
+  Change: cd9c3d4a0284c3037d55ba300aecf1af822d4565
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-20 21:23:56 +0000
+
+    Slightly updating API and making the methods capable of a start chain
+    method. 
+
+  Change: 6d2043cc3997f07b8cd074ebe062f70ad9b25e22
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-20 02:25:17 +0000
+
+    Fixing intendation, removing .travis.yml 
+
+------------------------------------------
+version 0.006 at 2020-02-06 06:32:44 +0000
+------------------------------------------
+
+  Change: a025932a3924fe7bca26ddcfe32d97999f177ec5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-02-06 07:32:44 +0000
+
+    Removed unnecessary requirement 
+
+------------------------------------------
+version 0.005 at 2020-02-06 06:29:10 +0000
+------------------------------------------
+
+  Change: 5dd64f86ab3d4a7c5a33fa22043817a3a9ce5732
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-02-06 07:29:10 +0000
+
+    Added cookie jar to LWP useragent, added shortcut for firing up chain
+    with LWP useragent. 
+
+------------------------------------------
+version 0.004 at 2020-02-06 03:45:06 +0000
+------------------------------------------
+
+  Change: 4d4c3235caef41847ee85120e86170e8db33924a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-02-06 04:45:06 +0000
+
+    Added travis, updated repo, no essential changes 
+
+------------------------------------------
+version 0.003 at 2012-10-13 22:38:14 +0000
+------------------------------------------
+
+  Change: 52130a37352bd3da26ce5398dbea88ad0ddd6889
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-14 00:38:14 +0000
+
+    Added method usage to the examples on SYNOPSIS 
+
+  Change: 4e86c5f90a67618d09262598ac616bddc66d1fa0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-14 00:31:47 +0000
+
+    Implemented suggestions of mst, now method calls possible 
+
+------------------------------------------
+version 0.001 at 2012-10-13 05:32:21 +0000
+------------------------------------------
+
+  Change: 3fcb3bbdd4a27cfca8cfd0261c6371ee01e29a79
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-13 07:32:21 +0000
+
+    Added theoretical non blocking example 
+
+  Change: 1d0a55af8bf833f2f983f21f55b6e26d47452988
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-13 07:26:19 +0000
+
+    Hups, fixed SYNOPSIS 
+
+  Change: bf3d9d8b5406301ffb513f2c96850a60b6a4ea03
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-13 07:25:03 +0000
+
+    First implementation, LWP based useragent, test suite 
+
+  Change: 6f359d395a4a1bd8f4170d89c138eeb75e544aa9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-12 02:30:11 +0000
+
+    initial commit 
+
+================
+End of releases.
+================
