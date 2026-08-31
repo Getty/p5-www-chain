@@ -1,0 +1,2 @@
+claude: true
+prompt: "Drain the WWW::Chain karr board: pick the top actionable ticket, delegate implementation to www-chain-worker, run `dzil test`, and hand off to review. Never release."
