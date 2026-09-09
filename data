@@ -1,0 +1,19 @@
+---
+claimed_at: 2026-09-09T09:37:07Z
+claimed_by: p5-www-chain
+class: standard
+completed: 2026-09-09T09:37:07Z
+created: 2026-08-31T04:02:47Z
+id: 1
+priority: low
+started: 2026-09-09T09:31:39Z
+status: done
+tags:
+- docs
+title: Flesh out WWW::Chain POD DESCRIPTION
+updated: 2026-09-09T09:37:07Z
+---
+
+lib/WWW/Chain.pm DESCRIPTION is a stub: "More documentation to come, API stabilized." Document the chain protocol (next_requests/next_responses/done), coderef vs subclass mode, and the stash, per skill www-chain-core.
+
+2026-09-09 09:36 Fleshed out WWW::Chain DESCRIPTION POD: chain protocol (parse_chain, next_requests/next_responses contract, done, request_count/result_count), the stash, coderef vs subclass authoring modes, pointer to WWW::Chain::UA. POD only, no code change. Commit 34adc2b. dzil test PASS 47 tests, loopback t/20+t/21 run (not skipped), author-pod-syntax ok.
