@@ -1,0 +1,18 @@
+---
+class: standard
+completed: 2026-09-09T09:38:20Z
+created: 2026-08-31T04:02:51Z
+id: 2
+priority: low
+started: 2026-09-09T09:31:43Z
+status: done
+tags:
+- docs
+- api
+title: Document non-blocking usage against the WWW::Chain::UA role
+updated: 2026-09-09T09:38:20Z
+---
+
+Only WWW::Chain::UA::LWP (blocking) ships. Document how to drive next_requests/next_responses by hand for a non-blocking/custom UA, and what a new backend that does `with WWW::Chain::UA` must implement (request_chain).
+
+2026-09-09 09:38 Documented WWW::Chain::UA role POD (had none): single requirement request_chain, with-fails-at-composition, request_chain loop contract, NON-BLOCKING USAGE hand-driven until done, WRITING A BACKEND skeleton. Added method request_chain POD to LWP backend (blocking loop, cookie_jar seed, request_with_lwp shortcut). POD only. Commit 0a64943. dzil test PASS 47 tests, loopback run, author-pod-syntax ok.
