@@ -2,7 +2,6 @@
 name: www-chain-worker
 description: "Default WWW::Chain worker — implement, refactor, debug and test everything in this single CPAN distribution: the chain protocol in lib/WWW/Chain.pm, the WWW::Chain::UA role and its LWP backend, and t/00–30. Pre-loaded with the chain protocol, the UA role contract and Moo house style. Use for any change under lib/WWW/ or t/. Leaves a commit-ready tree; never commits — commits belong to www-chain-release-manager."
 model: inherit
-allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
     - www-chain-core
