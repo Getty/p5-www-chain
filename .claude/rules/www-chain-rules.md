@@ -31,9 +31,9 @@ Depends on whether the Agent/Task tool is available to you.
   | Task | Agent |
   |---|---|
   | lib/WWW/, t/, the chain protocol, the UA role and its LWP backend | `www-chain-worker` (default) |
-  | Pre-release audit (CPAN) | `www-chain-release-checker` |
+  | Commits, `Changes`, card → done, pre-release audit | `www-chain-release-manager` |
 
-  Your lane: coordinate, inspect, plan, review diffs, run tests, manage git, write
+  Your lane: coordinate, inspect, plan, review diffs, run tests, write
   `Changes` notes and prose docs. When in doubt, delegate. Why: only the `www-chain-*`
   agents get `www-chain-core` / `getty-perl-moo` force-loaded via `briefing.skills`; you
   get no briefing and would touch the protocol with too little context.
@@ -43,6 +43,9 @@ Depends on whether the Agent/Task tool is available to you.
 Behavior-relevant = anything changing what the chain does or how a UA runs it:
 `lib/WWW/Chain.pm`, `lib/WWW/Chain/UA.pm`, `lib/WWW/Chain/UA/LWP.pm`, `cpanfile`,
 `dist.ini`, `t/`. Prose and `Changes` notes are not.
+
+**Only `www-chain-release-manager` commits.** A worker leaves a commit-ready tree and hands its card
+to `review`; you then dispatch `www-chain-release-manager` to cut the commit and close the card.
 
 ## Project hazards — why this file is worth loading
 
@@ -61,7 +64,7 @@ Behavior-relevant = anything changing what the chain does or how a UA runs it:
 ## Coordination — karr board (always in scope)
 
 Ticket coordination is the orchestrating agent's job, so `karr` is always in scope — don't
-invoke the `kanban-issues-karr-cli` skill first, just use it. Git-native kanban, state in
+invoke the `kanban-issues-karr-coordination` skill first, just use it. Git-native kanban, state in
 `refs/karr/*` of this repo: `karr board` / `karr list --compact` to see open work,
 `karr create "Title" --priority high`, `karr move ID in-progress --claim NAME`,
 `karr handoff ID --claim NAME`. Full surface: that skill.
@@ -74,7 +77,7 @@ event, not a cheap command.
 
 `dzil build` / `dzil test` are fine anytime. `dzil release` and any CPAN upload are
 STRICTLY forbidden without the maintainer's explicit go-ahead — even if a plan lists
-"release" as the next step. Pre-release audit goes through `www-chain-release-checker`.
+"release" as the next step. Pre-release audit goes through `www-chain-release-manager`.
 
 ## Public issues (GitHub) — never act without instruction
 

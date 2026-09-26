@@ -16,7 +16,7 @@ principle and lane are in `.claude/rules/www-chain-rules.md`.
 | Task | Agent |
 |---|---|
 | lib/WWW/, t/, the chain protocol, the UA role and its LWP backend | `www-chain-worker` (default) |
-| Pre-release audit before a CPAN release | `www-chain-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `www-chain-release-manager` |
 
 The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading them. Tickets live on the repo's `karr` board.
@@ -33,4 +33,4 @@ clone, and a hardlinked `SKILL.md` is edited in place, never with `Edit`/`Write`
 | `getty-perl-moo` | Moo classes, roles, attributes, lifecycle |
 | `getty-perl-core` | house Perl conventions |
 | `getty-perl-release-author-getty`, `perl-release-dist-ini` | the `[@Author::GETTY]` bundle and `dist.ini` |
-| `kanban-issues-karr-cli` | the karr board |
+| `kanban-issues-karr-coordination` | the karr board |
