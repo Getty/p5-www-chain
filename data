@@ -1,0 +1,26 @@
+---
+class: standard
+created: 2026-10-06T19:48:15Z
+id: 3
+priority: medium
+status: backlog
+tags:
+- docs
+- git
+- review-2026-10-06
+title: 'Branch phase2-karr-docs was never merged: the POD of k1 and k2 is done on
+  the board but missing on main'
+updated: 2026-10-06T19:48:15Z
+---
+
+`git log --oneline main..phase2-karr-docs`:
+
+- `34adc2b` Flesh out WWW::Chain POD DESCRIPTION (k1)
+- `0a64943` Document non-blocking usage and the WWW::Chain::UA role (k2)
+
+Both cards are `done`; `main` does not have the commits (`git diff --stat main...phase2-karr-docs`: `lib/WWW/Chain.pm` +58, `lib/WWW/Chain/UA.pm` +53, `lib/WWW/Chain/UA/LWP.pm` +15, POD only). On `main`, `WWW::Chain::UA` still has no description of what `request_chain` must do.
+
+Done when: both commits are on `main`, the branch is deleted, and `Changes` `{{$NEXT}}` has a documentation line.
+
+---
+Fleet review 2026-10-06 · kind: docs · confidence: verified
