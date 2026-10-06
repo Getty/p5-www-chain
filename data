@@ -1,0 +1,27 @@
+---
+class: standard
+created: 2026-10-06T19:48:20Z
+id: 4
+priority: low
+status: backlog
+tags:
+- bug
+- review-2026-10-06
+title: 'A chain without a final step cannot be built: www_chain($request) and a step
+  returning only requests die on the next_step isa check'
+updated: 2026-10-06T19:48:20Z
+---
+
+`lib/WWW/Chain.pm`: `www_chain` explicitly allows a missing step (`die ... unless !$next_step or ref $next_step eq 'CODE'`, line 54) and then passes `next_step => $next_step` to `new` (line 57). The attribute is `isa => AnyOf[Str, CodeRef]`, so `undef` fails.
+
+```
+perl -Ilib -MHTTP::Request -e 'use WWW::Chain; www_chain( HTTP::Request->new( GET => "http://x/" ) )'
+# isa check for "next_step" failed: undef is not any of the types!
+```
+
+The same happens inside `next_responses` when a step returns requests and no following step: `$self->_set_next_step($next_step)` at line 111 dies with the same message, in the middle of a running chain (after `clear_next_requests`, so the chain object is left half updated). `BUILD` guards its own call with `if $next_step` (line 126), the other two places do not. And even if it were set, `next_responses` would then call `$self->${\undef}(@responses)`.
+
+Done when: either a step-less chain works (the responses are stored/returned and the chain is done) or all three places reject it with one clear message; `t/10-base.t` covers `www_chain` with requests only.
+
+---
+Fleet review 2026-10-06 · kind: bug · confidence: verified
