@@ -1,0 +1,30 @@
+---
+class: standard
+created: 2026-10-06T19:48:25Z
+id: 5
+priority: low
+status: backlog
+tags:
+- bug
+- review-2026-10-06
+title: request_count ignores the requests of start_chain (0 instead of N in the subclass
+  style)
+updated: 2026-10-06T19:48:25Z
+---
+
+`www_chain` seeds the counter (`request_count => scalar @{$next_requests}`, `lib/WWW/Chain.pm:58`), `BUILD` (lines 119-128) does not when the requests come from `start_chain`.
+
+```
+package My; use Moo; extends 'WWW::Chain';
+sub start_chain { HTTP::Request->new( GET => 'http://x/' ), HTTP::Request->new( GET => 'http://y/' ), 'fin' }
+...
+My->new->request_count      # 0, with two requests queued
+www_chain( $r1, $r2, sub {} )->request_count   # 2
+```
+
+Every later step adds its requests (line 112), so the subclass style is permanently short by the first batch.
+
+Done when: `BUILD` sets `request_count` for the `start_chain` path and `t/30-methods.t` asserts `request_count`/`result_count` at the end of the chain.
+
+---
+Fleet review 2026-10-06 · kind: bug · confidence: verified
