@@ -29,4 +29,10 @@ ok($chain->done,'Chain is done');
 
 is_deeply($chain->stash,{ a => 1, b => 2 },'Stash is proper');
 
+my $no_step = HTTP::Request->new( GET => "http://www.perl.org/" );
+like(do { eval { www_chain($no_step) }; $@ },qr/found no next step/,"www_chain without a step is rejected clearly");
+
+my $stepless = www_chain($no_step, sub { return HTTP::Request->new( GET => "http://www.perl.org/" ) });
+like(do { eval { $stepless->next_responses(HTTP::Response->new) }; $@ },qr/found no next step/,"a step returning only requests is rejected clearly");
+
 done_testing;

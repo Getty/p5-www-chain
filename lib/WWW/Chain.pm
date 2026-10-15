@@ -88,6 +88,7 @@ sub parse_chain {
     }
   }
   die __PACKAGE__."->parse_chain found no HTTP::Request objects" unless @requests;
+  die __PACKAGE__."->parse_chain found no next step after the requests" unless defined $step;
   return \@requests, $step, @args;
 }
 
