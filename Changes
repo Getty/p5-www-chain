@@ -1,5 +1,6 @@
 {{$NEXT}}
 
+ - Fix request_count being 0 for the requests seeded by start_chain
  - Documentation: describe the WWW::Chain DESCRIPTION, non-blocking usage and the WWW::Chain::UA request_chain contract
 
 0.101     2025-12-25 05:35:27Z

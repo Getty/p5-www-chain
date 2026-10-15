@@ -40,4 +40,7 @@ ok($chain->done,'Chain is done');
 
 is_deeply($chain->stash,{ a => 1, b => 2 },'Stash is proper');
 
+is($chain->request_count,2,"request_count includes the start_chain requests");
+is($chain->result_count,2,"result_count counts both steps");
+
 done_testing;

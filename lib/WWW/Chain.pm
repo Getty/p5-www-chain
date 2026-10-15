@@ -125,6 +125,7 @@ sub BUILD {
     die "".(ref $self)." has no requests from start_chain" unless scalar @{$next_requests} > 0;
     $self->_set_next_step($next_step) if $next_step;
     $self->_set_next_requests($next_requests);
+    $self->_set_request_count(scalar @{$next_requests});
   }
 }
 
