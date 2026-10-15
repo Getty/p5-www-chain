@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+ - Documentation: describe the WWW::Chain DESCRIPTION, non-blocking usage and the WWW::Chain::UA request_chain contract
+
 0.101     2025-12-25 05:35:27Z
 
  - Switch to Dist::Zilla::PluginBundle::Git::VersionManager (through update of dzil bundle)

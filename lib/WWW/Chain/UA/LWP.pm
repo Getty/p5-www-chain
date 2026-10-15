@@ -27,3 +27,16 @@ sub request_chain {
 }
 
 1;
+
+=method request_chain
+
+  $ua->request_chain($chain);
+
+The blocking implementation of the L<WWW::Chain::UA> requirement: it seeds an
+empty C<cookie_jar> if none is set, then loops the chain — issuing each request
+in C<< @{$chain->next_requests} >> through C<< $self->request >> and feeding the
+responses back with C<< $chain->next_responses >> — until C<< $chain->done >>,
+and returns the chain. C<< $chain->request_with_lwp >> is the one-line shortcut
+that builds an agent internally.
+
+=cut
