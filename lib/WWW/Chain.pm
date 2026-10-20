@@ -48,6 +48,13 @@ has result_count => (
   default => sub { 0 },
 );
 
+has max_steps => (
+  isa => Int,
+  is => 'ro',
+  lazy => 1,
+  default => sub { 100 },
+);
+
 sub www_chain {
   my ( @args ) = @_;
   my ( $next_requests, $next_step, @others ) = __PACKAGE__->parse_chain(@args);
@@ -106,6 +113,8 @@ sub next_responses {
   $self->_set_result_count($self->result_count + 1);
   # If the first result is a request again, then we need to parse_chain again.
   if ( $self->is_request($result[0]) ) {
+    die "".(ref $self)."->next_responses stopped after ".$self->result_count." steps, the maximum is ".$self->max_steps
+      if $self->result_count >= $self->max_steps;
     my ( $next_requests, $next_step, @others ) = $self->parse_chain(@result);
     die "".(ref $self)."->next_responses can't parse the result, more arguments after next step" if @others;
     $self->_set_next_requests($next_requests);
@@ -220,7 +229,9 @@ C<next_responses(@responses)> feeds the results back and enforces the contract:
 it must be handed B<exactly> as many L<HTTP::Response> objects as there were
 requests (otherwise it dies), each one an L<HTTP::Response> (otherwise it dies),
 and never once the chain is C<done> (otherwise it dies). It then invokes the
-step as C<< $step->($chain, @responses) >>.
+step as C<< $step->($chain, @responses) >>. A chain runs at most C<max_steps>
+steps (100 by default); a step that asks for a round beyond that limit is fatal
+as well, and the message names the limit and the steps the chain ran.
 
 The step's return value decides continuation. If its first element
 C<is_request>, the return is C<parse_chain>d into the next batch plus step and
@@ -257,5 +268,10 @@ with neither is a build-time death.
 Run it blocking through the shipped L<WWW::Chain::UA::LWP> backend, or drive
 C<next_requests> / C<next_responses> by hand for non-blocking or custom-backend
 use — see L<WWW::Chain::UA>.
+
+=attr max_steps
+
+  The number of steps a chain may run at most, 100 by default. Set it when the
+  chain is built to give a longer or a shorter chain.
 
 =cut
