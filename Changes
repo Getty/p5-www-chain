@@ -1,8 +1,10 @@
 {{$NEXT}}
 
- - Reject a chain without a next step with one clear message in parse_chain (www_chain, start_chain, step results) instead of an isa failure
+ - Reject a chain without a next step with one clear message in parse_chain
+   (www_chain, start_chain, step results) instead of an isa failure
  - Fix request_count being 0 for the requests seeded by start_chain
- - Documentation: describe the WWW::Chain DESCRIPTION, non-blocking usage and the WWW::Chain::UA request_chain contract
+ - Documentation: describe the WWW::Chain DESCRIPTION, non-blocking usage and
+   the WWW::Chain::UA request_chain contract
  - The chain stops after 100 steps and says how far it got
  - The requests of a chain get a timeout of 30 seconds
  - The distribution declares LWP::Protocol::https, without it every
