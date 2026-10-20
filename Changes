@@ -5,6 +5,8 @@
  - Documentation: describe the WWW::Chain DESCRIPTION, non-blocking usage and the WWW::Chain::UA request_chain contract
  - The chain stops after 100 steps and says how far it got
  - The requests of a chain get a timeout of 30 seconds
+ - The distribution declares LWP::Protocol::https, without it every
+   https target fails
 
 0.101     2025-12-25 05:35:27Z
 

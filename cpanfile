@@ -1,6 +1,7 @@
 
 requires 'HTTP::Cookies', '6.08';
 requires 'LWP', '6.04';
+requires 'LWP::Protocol::https';
 requires 'Moo', '1.000004';
 requires 'MooX::Types::MooseLike::Base', '0.16';
 requires 'Safe::Isa', '1.000002';
