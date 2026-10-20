@@ -1,0 +1,30 @@
+---
+claimed_at: 2026-10-20T09:26:43Z
+claimed_by: k6-k10
+class: standard
+completed: 2026-10-20T09:26:43Z
+created: 2026-10-20T08:50:21Z
+id: 9
+priority: low
+started: 2026-10-20T09:00:26Z
+status: done
+tags:
+- http
+- timeout
+title: The requests of a chain need a timeout
+updated: 2026-10-20T09:26:43Z
+---
+
+lib/WWW/Chain/UA/LWP.pm:13-27 and lib/WWW/Chain.pm:63-66 set no timeout. The default of LWP is 180 seconds per request, and request_with_lwp builds the user agent itself, so the caller cannot change the timeout.
+
+Failure case: a hanging server blocks the chain for three minutes per request, without any way to break it.
+
+Decide: the requests of a chain get a timeout (30 seconds).
+
+2026-10-20 09:14 Worker k6-k10: done. BUILD in WWW::Chain::UA::LWP sets the timeout to 30 seconds, but only when the timeout is still the LWP default (LWP::UserAgent->new->timeout, 180); a timeout the caller sets stays. The BUILD of the Moo class is called by the generated constructor after SUPER::new, so the timeout is 180 there. Red proof: against the old lib the agent carries 180, the new test fails; the suite is green with the new lib.
+
+2026-10-20 09:21 Done: BUILD in WWW::Chain::UA::LWP sets a timeout of 30 seconds, a timeout of the caller stays. LWP 6.83 has no default_timeout, so the default (180) is read from a plain LWP::UserAgent->new->timeout. Both WWW::Chain::UA::LWP->new and request_with_lwp go through BUILD. Test in t/20-lwp.t was red against the old lib (got 180, expected 30), it is green now. Commit 528764a.
+
+2026-10-20 09:21 Done: every request of the agent runs with a timeout of 30 seconds, a timeout the caller sets stays. Verified offline with prove -lr t/ (59 tests green), the new test was red against the old lib. Commit 528764a.
+
+Erledigt in 528764a, nach main gezogen. Die Requests einer Kette bekommen einen Timeout von 30 Sekunden; ein Timeout, den der Aufrufer selbst setzt, bleibt. Die Umsetzung sitzt im BUILD von WWW::Chain::UA::LWP, damit auch request_with_lwp ihn bekommt. Rot-Nachweis: t/20-lwp.t ist gegen das alte lib/ rot (der Agent trug dort noch 180).
