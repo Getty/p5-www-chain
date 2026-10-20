@@ -13,6 +13,9 @@ my $server = Test::HTTP::Server->new();
 my $ua = WWW::Chain::UA::LWP->new;
 isa_ok($ua,'WWW::Chain::UA::LWP');
 
+is($ua->timeout,30,'The agent has a timeout of 30 seconds');
+is(WWW::Chain::UA::LWP->new( timeout => 60 )->timeout,60,'A timeout of the caller stays');
+
 my $chain = www_chain(HTTP::Request->new( GET => $server->uri.'echo' ), sub {
 	isa_ok($_[0],'WWW::Chain');
 	$_[0]->stash->{a} = 1;

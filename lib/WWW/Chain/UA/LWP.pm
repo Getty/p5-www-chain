@@ -10,6 +10,13 @@ use HTTP::Cookies;
 use Scalar::Util 'blessed';
 use Safe::Isa;
 
+sub BUILD {
+  my ( $self ) = @_;
+  my $default = LWP::UserAgent->new->timeout;
+  $self->timeout(30) if $self->timeout == $default;
+  return;
+}
+
 sub request_chain {
   my ( $self, $chain ) = @_;
   die __PACKAGE__."->request_chain needs a WWW::Chain object as parameter"
@@ -38,5 +45,8 @@ in C<< @{$chain->next_requests} >> through C<< $self->request >> and feeding the
 responses back with C<< $chain->next_responses >> — until C<< $chain->done >>,
 and returns the chain. C<< $chain->request_with_lwp >> is the one-line shortcut
 that builds an agent internally.
+
+Every request of the agent runs with a timeout of 30 seconds; a timeout the
+caller sets itself when it builds the agent stays.
 
 =cut
