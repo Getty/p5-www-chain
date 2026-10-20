@@ -1,0 +1,26 @@
+---
+claimed_at: 2026-10-20T09:26:34Z
+claimed_by: k6-k10
+class: standard
+completed: 2026-10-20T09:26:34Z
+created: 2026-10-20T08:50:17Z
+id: 8
+priority: medium
+started: 2026-10-20T09:00:20Z
+status: done
+tags:
+- docs
+- changes
+title: The Changes file must wrap at 78 columns
+updated: 2026-10-20T09:26:34Z
+---
+
+Changes:3 is 140 characters wide, Changes:5 is 119 characters wide. The house rule of the fleet wraps the Changes file at 78 columns, and the {{$NEXT}} block is published as the release notes in this way.
+
+Decide: the two entries are wrapped at 78 columns, nothing else in the file changes.
+
+2026-10-20 09:21 Done: the two long entries of the {{}} block are wrapped at 78 columns, the continuation lines are indented by two spaces like the other entries of the fleet; the rest of the file is untouched. The longest line of the block is now 77 characters. Commit 36c4003.
+
+2026-10-20 09:22 Done: the two long entries of the {{}} block are wrapped at 78 columns, nothing else in the file changed. Verified offline with prove -lr t/ (59 tests green). Commit 36c4003.
+
+Erledigt in 36c4003, nach main gezogen. Die Changes-Eintraege im {{$NEXT}}-Block sind bei 78 Spalten umgebrochen, wie die uebrigen Eintraege der Flotte; am Inhalt aendert sich nichts.
