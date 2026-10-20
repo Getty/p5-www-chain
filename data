@@ -1,0 +1,30 @@
+---
+claimed_at: 2026-10-20T09:26:16Z
+claimed_by: k6-k10
+class: standard
+completed: 2026-10-20T09:26:16Z
+created: 2026-10-20T08:50:07Z
+id: 6
+priority: high
+started: 2026-10-20T09:00:08Z
+status: done
+tags:
+- cpanfile
+- dependencies
+title: The distribution must declare LWP::Protocol::https
+updated: 2026-10-20T09:26:16Z
+---
+
+cpanfile:3 requires LWP 6.04, but not LWP::Protocol::https. WWW::Chain::UA::LWP (lib/WWW/Chain/UA/LWP.pm:21) fetches any user url, and ex/synopsis.pl:20 uses https://conflict.industries/.
+
+Failure case: a fresh installation with a chain over an https target gets the answer "Protocol scheme 'https' is not supported" (HTTP 501) from LWP. The chain collects 501 responses instead of data and runs on.
+
+Decide: the cpanfile declares LWP::Protocol::https.
+
+2026-10-20 09:15 Worker k6-k10: done. cpanfile declares LWP::Protocol::https without a version, alphabetically after LWP. Red proof is a file finding (the line was missing before, it is there now); the failure mode of the card was reproduced offline by hiding the module: an https request answers 501 'Protocol scheme https is not supported'. t/cpanfile.t (k10) holds the declaration afterwards.
+
+2026-10-20 09:21 Done: cpanfile requires LWP::Protocol::https, no version, in the house style. Proof: the cpanfile of main had no line for it, now it has one; without the module every https request answers 501 (reproduced offline). Also found: .worktreeinclude is untracked in the main checkout and needs a commit of its own there - not touched by me, the main checkout is read-only for this branch. Also found: the released Changes blocks below {{}} are not wrapped (line 9 is 91 characters wide); k8 leaves them alone per the card. Commit baabd0e.
+
+2026-10-20 09:21 Done: the distribution declares LWP::Protocol::https in the cpanfile. Verified offline with prove -lr t/ (59 tests green). Commit baabd0e.
+
+Erledigt in baabd0e, nach main gezogen. Das cpanfile deklariert jetzt LWP::Protocol::https: ohne den Baustein kann LWP kein https, und die Kette sammelte dann 501-Antworten und lief weiter. Der rote Beweis ist hier ein Dateibefund (die Zeile fehlt vorher und steht danach im cpanfile), der Test aus k10 sichert die Deklaration danach ab.
