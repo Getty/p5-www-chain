@@ -1,0 +1,32 @@
+---
+claimed_at: 2026-10-20T09:26:25Z
+claimed_by: k6-k10
+class: standard
+completed: 2026-10-20T09:26:25Z
+created: 2026-10-20T08:50:12Z
+id: 7
+priority: high
+started: 2026-10-20T09:00:14Z
+status: done
+tags:
+- api
+- limits
+title: A chain needs a limit on its steps
+updated: 2026-10-20T09:26:25Z
+---
+
+A chain has no limit on its steps.
+
+lib/WWW/Chain/UA/LWP.pm:18 runs while (!$chain->done) without a limit on the rounds or the steps. WWW::Chain::next_responses (lib/WWW/Chain.pm:95-118) counts only request_count and result_count and checks nothing.
+
+Failure case: a step answers again and again (a pagination that never ends, or a login step that calls itself back) and the backend fires requests without end. request_with_lwp (Chain.pm:63) cannot break it, the process never terminates.
+
+Decide: the chain gets a max_steps attribute (a default of 100) and next_responses checks it.
+
+2026-10-20 09:13 Worker k6-k10: implementing. Decision: max_steps attribute (Int, default 100) on WWW::Chain, checked in next_responses where the step is counted. Refinement to the coordinator's placement: the check sits in the branch where the chain wants to continue (is_request), so a chain with exactly max_steps steps can still finish, and the message names the steps run and the limit. Condition is 'result_count >= max_steps' there; a check straight after _set_result_count would let a 101st step run and report 101 steps against a limit of 100.
+
+2026-10-20 09:21 Done: max_steps attribute (Int, default 100) in WWW::Chain; next_responses dies with a message that names the limit and the steps the chain ran. Decision: the check sits in the branch where the chain wants to continue, so a chain with exactly max_steps steps still finishes; a chain that asks for one round more is fatal. Test in t/10-base.t was red against the old lib ('the chain did not stop at the limit'), it is green now. Commit 1690bdb.
+
+2026-10-20 09:21 Done: a chain runs at most 100 steps (max_steps, Int, default 100) and next_responses dies with a message that names the limit and the steps the chain ran. Verified offline with prove -lr t/ (59 tests green), the new test was red against the old lib. Commit 1690bdb.
+
+Erledigt in 1690bdb, nach main gezogen. WWW::Chain bekommt das Attribut max_steps (Vorgabe 100). next_responses prueft die Grenze dort, wo der Schritt gezaehlt wird, damit sie fuer jeden UA gilt und die Schleife in request_chain von selbst abbricht. Der Fehler ist ein die im Stil des Repos und nennt die Grenze und die Zahl der gelaufenen Schritte. Rot-Nachweis: t/10-base.t ist gegen das alte lib/ rot (fehlgeschlagene Erwartungen, kein die); der Test hat eine eigene Iterationsgrenze, damit er gegen das alte lib/ nicht haengt.
