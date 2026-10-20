@@ -1,0 +1,28 @@
+---
+claimed_at: 2026-10-20T09:26:53Z
+claimed_by: k6-k10
+class: standard
+completed: 2026-10-20T09:26:53Z
+created: 2026-10-20T08:50:26Z
+id: 10
+priority: low
+started: 2026-10-20T09:00:32Z
+status: done
+tags:
+- cpanfile
+- test
+title: The declared prerequisites must be checked by a test
+updated: 2026-10-20T09:26:53Z
+---
+
+No test in t/ reads the cpanfile, so a prerequisite that the code uses but that is missing in the cpanfile stays unnoticed. The missing https prerequisite of the cpanfile is exactly such a case.
+
+Decide: a new t/cpanfile.t reads the cpanfile and checks every prerequisite that the code uses. /home/getty/dev/p5-www-vastai/t/cpanfile.t is the pattern to follow.
+
+2026-10-20 09:17 Worker k6-k10: done. t/cpanfile.t reads the cpanfile, builds %requires and checks HTTP::Cookies, LWP, LWP::Protocol::https, Moo, MooX::Types::MooseLike::Base and Safe::Isa; HTTP::Request and HTTP::Response stay out, they come with LWP. The test checks a file, not behaviour, so it is not red against the old lib; the failure mode was shown by restoring the old cpanfile: the test fails on LWP::Protocol::https. The file follows the pattern of p5-www-vastai/t/cpanfile.t (File::Spec, FindBin, core modules only) instead of Path::Tiny, to keep the cpanfile free of a new test dependency.
+
+2026-10-20 09:21 Done: new t/cpanfile.t reads the cpanfile and checks HTTP::Cookies, LWP, LWP::Protocol::https, Moo, MooX::Types::MooseLike::Base and Safe::Isa. HTTP::Request and HTTP::Response are not declared, they come via LWP -> HTTP::Message. The test was red against the old cpanfile ('LWP::Protocol::https is a declared prerequisite' failed), it is green now. Commit 0ab41e5.
+
+2026-10-20 09:21 Done: t/cpanfile.t reads the cpanfile and checks the declared prerequisites. Verified offline with prove -lr t/ (59 tests green), the new test was red against the old cpanfile. Commit 0ab41e5.
+
+Erledigt in 0ab41e5, nach main gezogen. t/cpanfile.t liest das cpanfile und prueft die deklarierten Voraussetzungen (HTTP::Cookies, LWP, LWP::Protocol::https, Moo, MooX::Types::MooseLike::Base, Safe::Isa). Der Test prueft eine Datei und kein Verhalten — er ist gegen das alte lib/ gruen, das ist hier so vermerkt.
