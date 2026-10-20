@@ -1,0 +1,46 @@
+---
+class: standard
+completed: 2026-10-20T17:06:58Z
+created: 2026-10-20T16:36:29Z
+id: 11
+priority: low
+started: 2026-10-20T17:06:58Z
+status: done
+tags:
+- release
+- changes
+title: Der Changes traegt keine Kopfzeile
+updated: 2026-10-20T17:06:58Z
+---
+
+Der Changes dieser Distribution traegt keine Kopfzeile.
+
+Die Hausform (Skill getty-git-commit-style) sieht so aus:
+
+    Revision history for <name>
+
+    {$NEXT}
+      - ...
+
+Vierzehn der achtzehn Distributionen der WWW-Flotte tragen die Kopfzeile, vier
+nicht. Diese Distribution gehoert zu den vier.
+
+Es wird genau eine Zeile ergaenzt: die Kopfzeile mit dem Namen aus dist.ini
+(WWW-Chain) und die Leerzeile darunter. Sonst nichts.
+
+Kein neuer Eintrag unter {$NEXT}: die Karte aendert die Form der Datei, nicht
+ihren Inhalt. Die Einrueckung der Eintraege (2 oder 4 Leerzeichen) bleibt
+unangetastet - sie ist je Datei verschieden und nicht Teil dieser Karte.
+
+Aenderungen ausserhalb von Changes: nicht.
+Commit-Betreff nennt die Karte als (kNN), kein #NN.
+
+2026-10-20 17:04 Start: Karte gelesen, Worktree .claude/worktrees/k11-chain (Branch k11-chain, von lokalem main 07deb43). Changes beginnt ohne Kopfzeile mit {{$NEXT}}.
+
+2026-10-20 17:05 Commit 7219fa3 auf Branch k11-chain: Changes bekommt die Kopfzeile 'Revision history for WWW-Chain' plus Leerzeile. Diff gegen main: genau 2 zusaetzliche Zeilen ganz oben, sonst nichts. Kein Eintrag unter {$NEXT} (Karte aendert die Form, nicht den Inhalt). Suite offline gruen: prove -lr t/ -> 6 Dateien, 59 Tests, PASS.
+
+2026-10-20 17:05 Done: Kopfzeile 'Revision history for WWW-Chain' plus Leerzeile in Changes ergaenzt (Commit 7219fa3, Branch k11-chain). Diff gegen main: genau 2 Zeilen. Suite gruen: 6 Dateien, 59 Tests.
+
+2026-10-20 17:05 Also found: die Eintraege in dieser Changes-Datei sind mit 1 Leerzeichen statt 2 eingerueckt (Fortsetzungszeilen mit 3). Das weicht von der Hausform des Skills getty-git-commit-style ab, die Karte nimmt die Einrueckung aber ausdruecklich aus dem Umfang - nicht geaendert.
+
+Koordination: der Commit 7219fa3 steht auf main (ff-only gemergt). Der Diff gegen main zeigt genau zwei zusaetzliche Zeilen ganz oben in der Changes-Datei (Kopfzeile 'Revision history for WWW-Chain' und die Leerzeile darunter), sonst nichts; kein Eintrag unter {{'$$NEXT'}}, die Einrueckung der Eintraege ist unveraendert. Suite offline: 6 Dateien, 59 Tests, PASS.
