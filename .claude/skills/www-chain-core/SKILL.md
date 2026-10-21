@@ -84,3 +84,19 @@ vice versa) because `parse_chain` treats coderef and `->can`-able string alike.
 
 `10-base.t` and `30-methods.t` prove the protocol without a socket; the LWP tests
 prove the backend. A protocol change must keep the hand-fed tests green.
+
+## Hazards
+
+- The `die`s in `next_responses` are the **contract**, not defensive noise: exact
+  response count, `HTTP::Response`-only, not-when-`done` are guarantees callers rely
+  on. A green test after weakening one proves nothing — the hand-fed tests
+  (`t/10-base.t`, `t/30-methods.t`) are socket-free and must stay green on any
+  protocol change.
+- Two step modes, one builder: `parse_chain` accepts a `CodeRef` **and** a `->can`-able
+  `Str`, but the exported `www_chain` builder rejects a string step. The asymmetry is
+  deliberate — don't "unify" the two without knowing why.
+- The shared skills under `.claude/skills/` are build artifacts installed by `skilletor`
+  (sources: Getty/skills, Getty/karr); the next `skilletor sync` overwrites them.
+  Never edit them — change the source. `www-chain-core` itself is project-owned and
+  edited normally.
+
