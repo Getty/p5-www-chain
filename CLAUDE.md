@@ -11,7 +11,8 @@ non-blocking use. The chain protocol, the UA role and the authoring modes are in
 ## Delegation
 
 Delegate behavior-relevant code to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/www-chain-rules.md`.
+the principle is a shared house rule (skilletor bundle `getty-cpan-dist@getty`); lanes
+and hazards are in `.claude/rules/www-chain-rules.md`.
 
 | Task | Agent |
 |---|---|
