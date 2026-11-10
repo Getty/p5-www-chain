@@ -33,10 +33,9 @@ Never `git commit`: leave the tree commit-ready and report what changed and why,
   count, `HTTP::Response`-only, not-when-`done`) and the return-decides-continuation
   rule are the public contract — a change there is a behavior change, prove it with
   the hand-fed tests, never soften a `die` to make a test pass.
-- **Skill files under `.claude/skills/` are hardlinks** to `~/dev/skills/…` (and
-  `~/dev/karr/…`). Editing one with `Edit`/`Write` detaches the inode and forks
-  every other repo's copy; rewrite in place (`cat > path <<'EOF'`) instead. The
-  project-owned `www-chain-core` has no link — normal edits are fine there.
+- **Shared skills under `.claude/skills/` are installed by skilletor** and
+  re-rendered on every sync; a change one of them needs goes as a note on your
+  card. The project-owned `www-chain-core` is edited here.
 
 ## Verification
 
