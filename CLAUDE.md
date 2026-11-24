@@ -19,7 +19,7 @@ and hazards are in `.claude/rules/www-chain-rules.md`.
 | lib/WWW/, t/, the chain protocol, the UA role and its LWP backend | `www-chain-worker` (default) |
 | Commits, `Changes`, card → done, pre-release audit | `www-chain-release-manager` |
 
-The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+The agents carry their skills via `skills:` (see `.claude/agents/`); the main
 agent delegates rather than loading them. Tickets live on the repo's `karr` board.
 
 ## Skills
